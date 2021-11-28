@@ -3,7 +3,9 @@ package com.EmployeeManagement.controller;
 import java.util.List;
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.EmployeeManagement.dto.EmployeeDTO;
+import com.EmployeeManagement.dto.ManagerDTO;
 import com.EmployeeManagement.entity.Employee;
+
 import com.EmployeeManagement.service.EmployeeService;
 
 
@@ -24,10 +29,17 @@ public class EmployeeController {
 	@Autowired
 	private EmployeeService employeeService;
 	
+	@Autowired
+	private Environment environment;
+	
 	
 	@PostMapping(value = "/createEmployee")
-	public String createEmployee(@RequestBody Employee employee) {
-		return employeeService.createEmployee(employee);
+	public String createEmployee(@RequestBody EmployeeDTO empdto) {
+		
+		System.out.println("In API class " + empdto);
+		
+		String msg = employeeService.createEmployee(empdto);
+		return msg;
 	}
 	
 	@GetMapping(value = "/getEmployee/{empId}")
@@ -46,9 +58,14 @@ public class EmployeeController {
 	}
 	
 	@PutMapping(value = "/updateEmployee/{empId}")
-	public Employee updateEmployee(@PathVariable Long empId, @RequestBody Employee employee) {
-		Employee emp =  employeeService.updateEmployee(empId, employee);
+	public EmployeeDTO updateEmployee(@PathVariable Long empId, @RequestBody EmployeeDTO employee) {
+		EmployeeDTO emp =  employeeService.updateEmployee(empId, employee);
 		return emp;
+	}
+	
+	@GetMapping(value = "/getEmployeeByManager/{managerEmail}")
+	public List<Employee> employeeByManager(@PathVariable String managerEmail) throws Exception{
+		return employeeService.employeeByManager(managerEmail);
 	}
 
 }

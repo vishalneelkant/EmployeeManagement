@@ -2,11 +2,14 @@ package com.EmployeeManagement.service;
 
 import java.util.List;
 
+import com.EmployeeManagement.dto.EmployeeDTO;
 import com.EmployeeManagement.entity.Employee;
+
+
 
 public interface EmployeeService {
 	
-	public String createEmployee(Employee emp);
+	public String createEmployee(EmployeeDTO emp);
 	
 	public Employee getEmployee(Long empId);
 	
@@ -14,5 +17,7 @@ public interface EmployeeService {
 	
 	public List<Employee> getAllEmployee();
 	
-	public Employee updateEmployee(Long empId, Employee employee);
+	public EmployeeDTO updateEmployee(Long empId, EmployeeDTO empDTO);
+	
+	public List<Employee> employeeByManager(String managerEmail) throws Exception;
 }

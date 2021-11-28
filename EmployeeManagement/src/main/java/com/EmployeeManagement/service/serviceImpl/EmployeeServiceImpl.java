@@ -3,7 +3,6 @@ package com.EmployeeManagement.service.serviceImpl;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.EmployeeManagement.dto.EmployeeDTO;
 import com.EmployeeManagement.entity.Employee;
+import com.EmployeeManagement.entity.Manager;
 import com.EmployeeManagement.repository.EmployeeRepository;
 import com.EmployeeManagement.service.EmployeeService;
 
@@ -23,8 +24,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private EmployeeRepository employeeRepo;
 
 	@Override
-	public String createEmployee(Employee emp) {
-	
+	public String createEmployee(EmployeeDTO empDTO) {
+		
+		System.out.println(empDTO);
+		
+		Employee emp = new Employee();
+		
+		emp.setDept(empDTO.getDept());
+		emp.setDesignation(empDTO.getDesignation());
+		emp.setEmployeeName(empDTO.getEmployeeName());
+		emp.setSalary(empDTO.getSalary());
+		emp.setManagerEmail(empDTO.getManagerEmail().toLowerCase());
+		
 		Employee e = employeeRepo.save(emp);
 		return "added " + e.getEmployeeName() + " " + "with id" + " " + e.getEmployeeId(); 
 	}
@@ -60,6 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			emp.setEmployeeId(e.getEmployeeId());
 			emp.setEmployeeName(e.getEmployeeName());
 			emp.setSalary(e.getSalary());
+			emp.setManagerEmail(e.getManagerEmail());
 			
 			empList.add(emp);
 		}
@@ -69,45 +81,61 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 	
 	@Override
-	public Employee updateEmployee(Long empId, Employee employee) {
+	public EmployeeDTO updateEmployee(Long empId, EmployeeDTO empDTO) {
 		
 		Employee empToSave = new Employee();
 		
 		Optional<Employee> optionalEmp =  employeeRepo.findById(empId);
 		Employee empFromRepo = optionalEmp.get();
 		
-		if(employee.getDept()==null || employee.getDept().isEmpty()) {
+		if(empDTO.getDept()==null || empDTO.getDept().isEmpty()) {
 			empToSave.setDept(empFromRepo.getDept());
 		}
 		else {
-			empToSave.setDept(employee.getDept());
+			empToSave.setDept(empDTO.getDept());
 		}
 		
-		if(employee.getDesignation()==null|| employee.getDesignation().isEmpty()) {
+		if(empDTO.getDesignation()==null|| empDTO.getDesignation().isEmpty()) {
 			empToSave.setDesignation(empFromRepo.getDesignation());
 		}
 		else {
-			empToSave.setDesignation(employee.getDesignation());
+			empToSave.setDesignation(empDTO.getDesignation());
 		}
 		
-		if(employee.getEmployeeName()==null || employee.getEmployeeName().isEmpty()) {
+		if(empDTO.getEmployeeName()==null || empDTO.getEmployeeName().isEmpty()) {
 			empToSave.setEmployeeName(empFromRepo.getEmployeeName());
 		}
 		else {
-			empToSave.setEmployeeName(employee.getEmployeeName());
+			empToSave.setEmployeeName(empDTO.getEmployeeName());
 		}
 		
-		if(employee.getSalary()==null) {
+		if(empDTO.getSalary()==null) {
 			empToSave.setSalary(empFromRepo.getSalary());
 		}
 		else {
-			empToSave.setSalary(employee.getSalary());
+			empToSave.setSalary(empDTO.getSalary());
+		}
+		if(empDTO.getManagerEmail()==null || empDTO.getManagerEmail().isBlank()) {
+			empToSave.setEmployeeName(empFromRepo.getEmployeeName());
+		}
+		else {
+			empToSave.setManagerEmail(empDTO.getManagerEmail());
 		}
 		
 		empToSave.setEmployeeId(empFromRepo.getEmployeeId());
 		
 		employeeRepo.save(empToSave);
-		return empToSave;
+		return empDTO;
+	}
+
+	@Override
+	public List<Employee> employeeByManager(String managerEmail) throws Exception {
+		List<Employee> employeeList = null;
+	    employeeList = employeeRepo.findBymanagerEmail(managerEmail);
+		if(employeeList == null) {
+			throw new Exception("No employee Available");
+		}
+		return employeeList;
 	}
 	
 	
